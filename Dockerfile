@@ -2,7 +2,7 @@
 FROM ubuntu:22.04
 
 # Install required packages
-RUN apt-get update 
+RUN apt-get update && apt-get install curl -y
 
 RUN curl -O https://dist.ipfs.tech/kubo/install.sh \
     && chmod +x install.sh \
