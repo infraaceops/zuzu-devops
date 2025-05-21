@@ -1,0 +1,70 @@
+name: ZUZ Gateway CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test-deployment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Compose
+      uses: docker/setup-compose-action@v3
+
+    - name: Build containers
+      run: docker-compose build
+
+    - name: Start services
+      run: |
+        mkdir -p ./logs
+        docker-compose up -d
+        sleep 10  # Initial startup buffer
+
+    - name: Run service tests
+      run: |
+        # Function to check logs
+        check_log() {
+          local service=$1
+          local pattern=$2
+          local attempts=0
+          local max_attempts=10
+
+          while [[ $attempts -lt $max_attempts ]]; do
+            if [[ -f "./logs/$service.txt" ]] && grep -qE "$pattern" "./logs/$service.txt"; then
+              echo "$service address found"
+              return 0
+            fi
+            sleep 6
+            attempts=$((attempts+1))
+          done
+          echo "$service validation failed"
+          exit 1
+        }
+
+        # Verify services
+        check_log "tor" ".onion$"
+        check_log "i2p" ".b32.i2p$"
+        check_log "ipfs" "^Qm[1-9A-HJ-NP-Za-km-z]{44}$"
+
+        # Verify HTTP service
+        docker exec zuz-zuz-1 curl -sSf localhost:80 > /dev/null
+        docker exec zuz-zuz-1 curl -sSf localhost:80/status | grep -q "200 OK"
+
+    - name: Show service logs
+      if: ${{ always() }}
+      run: |
+        docker-compose logs --no-color | head -n 200
+        ls -la ./logs
+        echo "Tor Address: $(cat ./logs/tor.txt || true)"
+        echo "I2P Address: $(cat ./logs/i2p.txt || true)"
+        echo "IPFS CID: $(cat ./logs/ipfs.txt || true)"
+
+    - name: Cleanup
+      run: docker-compose down -v

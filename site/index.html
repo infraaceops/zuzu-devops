@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ZUZ Privacy Gateway</title>
+</head>
+<body>
+    <h1>Welcome to ZUZ Privacy Gateway</h1>
+    <div id="status">
+        <p>Network: <span id="network">Detecting...</span></p>
+    </div>
+    <script>
+        // Network detection
+        const host = window.location.hostname;
+        let network = 'Clearnet';
+        if (host.endsWith('.onion')) network = 'Tor';
+        if (host.endsWith('.i2p')) network = 'I2P';
+        document.getElementById('network').textContent = network;
+    </script>
+</body>
+</html>
