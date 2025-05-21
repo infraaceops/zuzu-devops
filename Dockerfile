@@ -2,7 +2,7 @@
 FROM ubuntu:22.04
 
 # Install required packages
-RUN apt-get update && apt-get install curl wget -y
+RUN apt-get update && apt-get install curl wget software-properties-common -y
 
 RUN wget https://dist.ipfs.tech/kubo/v0.14.0/kubo_v0.14.0_linux-amd64.tar.gz && \
     tar -xvzf kubo_v0.14.0_linux-amd64.tar.gz && \
