@@ -2,11 +2,14 @@
 FROM ubuntu:22.04
 
 # Install required packages
-RUN apt-get update && apt-get install curl -y
+RUN apt-get update && apt-get install curl wget -y
 
-RUN curl -O https://dist.ipfs.tech/kubo/install.sh \
-    && chmod +x install.sh \
-    && ./install.sh
+RUN wget https://dist.ipfs.tech/kubo/v0.14.0/kubo_v0.14.0_linux-amd64.tar.gz && \
+    tar -xvzf kubo_v0.14.0_linux-amd64.tar.gz && \
+    cd kubo && \
+    bash install.sh && \
+    cd .. && \
+    rm -rf kubo kubo_v0.14.0_linux-amd64.tar.gz
 
 RUN add-apt-repository ppa:purplei2p/i2pd \
     && apt-get update \
