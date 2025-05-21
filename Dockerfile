@@ -2,11 +2,19 @@
 FROM ubuntu:22.04
 
 # Install required packages
-RUN apt-get update && apt-get install -y \
+RUN apt-get update 
+
+RUN curl -O https://dist.ipfs.tech/kubo/install.sh \
+    && chmod +x install.sh \
+    && ./install.sh
+
+RUN add-apt-repository ppa:purplei2p/i2pd \
+    && apt-get update \
+    && apt-get install i2pd
+    
+Run apt-get install -y \
     nginx \
-    i2pd \
     tor \
-    kubo \
     supervisor \
     i2pd-tools \
     && rm -rf /var/lib/apt/lists/*
