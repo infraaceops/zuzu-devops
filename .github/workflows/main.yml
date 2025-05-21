@@ -19,12 +19,12 @@ jobs:
       uses: docker/setup-compose-action@v1.2.0
 
     - name: Build containers
-      run: docker-compose build
+      run: docker compose build
 
     - name: Start services
       run: |
         mkdir -p ./logs
-        docker-compose up -d
+        docker compose up -d
         sleep 10  # Initial startup buffer
 
     - name: Run service tests
@@ -60,11 +60,11 @@ jobs:
     - name: Show service logs
       if: ${{ always() }}
       run: |
-        docker-compose logs --no-color | head -n 200
+        docker compose logs --no-color | head -n 200
         ls -la ./logs
         echo "Tor Address: $(cat ./logs/tor.txt || true)"
         echo "I2P Address: $(cat ./logs/i2p.txt || true)"
         echo "IPFS CID: $(cat ./logs/ipfs.txt || true)"
 
     - name: Cleanup
-      run: docker-compose down -v
+      run: docker compose down -v
